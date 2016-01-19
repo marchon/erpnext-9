@@ -1,0 +1,115 @@
+<style>
+	.print-format table, .print-format tr, 
+	.print-format td, .print-format div, .print-format p {
+		font-family: Monospace;
+		line-height: 200%;
+		vertical-align: middle;
+	}
+	@media screen {
+		.print-format {
+			width: 2.9in;
+			padding: 0.25in;
+			min-height: 8in;
+		}
+	}
+</style>
+
+<p class="text-center">
+	{{ doc.company }}<br>
+	{{ doc.select_print_heading or _(doc.sales_type) }}<br>
+</p>
+<p>
+	<b>{{ _("Recibo No") }}:</b> {{ doc.name }}<br>
+	<b>{{ _("Date") }}:</b> {{ doc.get_formatted("posting_date") }}<br>
+	<b>{{ _("Customer") }}:</b> {{ doc.customer_name }}<br>
+	<b>{{ _("RUC") }}:</b> {{ doc.tax_id }}<br>
+	<b>{{ _("Dirección") }}:</b> {{ doc.address_display }}
+</p>
+
+<hr>
+<table class="table table-condensed cart no-border">
+	<thead>
+		<tr>
+			<th width="50%">{{ _("Item") }}</b></th>
+			<th width="25%" class="text-right">{{ _("Qty") }}</th>
+			<th width="25%" class="text-right">{{ _("Amount") }}</th>
+		</tr>
+	</thead>
+	<tbody>
+		{%- for item in doc.items -%}
+		<tr>
+			<td>
+				{{ item.item_code }}
+				{%- if item.item_name != item.item_code -%}
+					<br>{{ item.item_name }}{%- endif -%}
+			</td>
+			<td class="text-right">{{ item.qty }}<br> {{ item.get_formatted("rate") }}</td>
+			<td class="text-right">{{ item.get_formatted("amount") }}</td>
+		</tr>
+		{%- endfor -%}
+	</tbody>
+</table>
+<table class="table table-condensed no-border">
+	<tbody>
+		<tr>
+			<td class="text-right" style="width: 70%">
+				{{ _("Net Total") }}
+			</td>
+			<td class="text-right">
+				{{ doc.get_formatted("net_total") }}
+			</td>
+		</tr>
+		{%- for row in doc.taxes -%}
+		{%- if not row.included_in_print_rate -%}
+		<tr>
+			<td class="text-right" style="width: 70%">
+				{{ row.description }}
+			</td>
+			<td class="text-right">
+				{{ row.get_formatted("tax_amount", doc) }}
+			</td>
+		</tr>
+		{%- endif -%}
+		{%- endfor -%}
+		{%- if doc.discount_amount -%}
+		<tr>
+			<td class="text-right" style="width: 75%">
+				{{ _("Discount") }}
+			</td>
+			<td class="text-right">
+				{{ doc.get_formatted("discount_amount") }}
+			</td>
+		</tr>
+		{%- endif -%}
+		{% if doc.get("taxes", filters={"included_in_print_rate": 1}) %}
+		<tr>
+			{%- for row in doc.taxes -%}
+				{%- if row.included_in_print_rate -%}
+					<td class="text-right" style="width: 70%">
+						{{ row.description }}
+					</td>
+					<td class="text-right">
+						{{ row.get_formatted("tax_amount_after_discount_amount", doc) }}
+					</td>
+		<tr>
+				{%- endif -%}
+			{%- endfor -%}
+		{%- endif -%}
+		<tr>
+			<td class="text-right" style="width: 75%">
+				<b>{{ _("Grand Total") }}</b>
+			</td>
+			<td class="text-right">
+				{{ doc.get_formatted("grand_total") }}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				{{ doc.get_formatted("in_words") }}
+			</td>
+		</tr>
+	</tbody>
+</table>
+<hr>
+<p>{{ doc.terms or "" }}</p>
+<p class="text-center">{{ _("Thank you, please visit again.") }}</p>
