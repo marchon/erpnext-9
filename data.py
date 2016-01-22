@@ -398,7 +398,7 @@ def money_in_words(number, main_currency = None, fraction_currency=None):
 	in_million = True
 	if number_format == "#,##,###.##": in_million = False
 
-	out = main_currency + ' ' + in_words(main, in_million).title()
+	out = in_words(main, in_million).title() + ' soles'
 	if cint(fraction):
 		out = out + ' ' + _('and') + ' ' + in_words(fraction, in_million).title() + ' ' + fraction_currency
 
