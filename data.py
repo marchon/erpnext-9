@@ -401,8 +401,8 @@ def money_in_words(number, main_currency = None, fraction_currency=None):
 	out = in_words(main, in_million).title()
 	if cint(fraction):
 		out = out + ' ' + _('and') + ' ' + fraction + '/100'
-	else
-		out = out + ' ' + _('and') + '00/100'
+	else:
+		out = out + ' ' + _('and') + ' 00/100'
 
 	return out + ' soles'
 
